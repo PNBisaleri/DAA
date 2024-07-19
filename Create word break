@@ -1,0 +1,45 @@
+class Node{
+    public:
+    vector<Node*> child = vector<Node*>(26,NULL);
+    bool isword=false;
+};
+class Solution {
+    
+    Node* root = NULL;
+    
+    void insert(string& s){
+        Node* curr = root;
+        for(int i=0;i<s.length();++i){
+            if(!curr->child[s[i]-'a'])
+                curr->child[s[i]-'a']= new Node();
+            curr = curr->child[s[i]-'a'];
+        }
+        curr->isword = true;
+    }
+    
+    Node* findCharInChildren(char& c,Node* curr){
+        return curr->child[c-'a'];
+    }
+    bool wordBreakUtil(string& s,int b,Node* curr,vector<int>& dp){
+        if(b==s.length())return true;
+        if(dp[b]!=-1)return dp[b]; 
+        
+        bool ans = false;
+        for(int i=b;i<s.length();++i){
+            curr = findCharInChildren(s[i],curr);
+            if(!curr)break;
+            if(curr->isword)ans |= wordBreakUtil(s,i+1,root,dp);
+        }
+        
+        return dp[b] = ans;
+    }
+public:
+    bool wordBreak(string s, vector<string>& dic) {
+        vector<int> dp(s.size(),-1);
+         root = new Node();
+        for(int i=0;i<dic.size();++i){
+            insert(dic[i]);
+        }
+        return wordBreakUtil(s,0,root,dp);
+    }
+};
